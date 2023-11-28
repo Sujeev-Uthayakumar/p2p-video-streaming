@@ -25,10 +25,7 @@ const storage = multer.diskStorage({
     cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + "." + file.mimetype.split("/")[1]
-    );
+    cb(null, file.originalname);
   },
 });
 
@@ -41,7 +38,6 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.post("/upload", upload.single("video"), (req, res) => {
-  console.log(req.file);
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -49,8 +45,6 @@ app.post("/upload", upload.single("video"), (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("A user connected: " + socket.id);
-
   socket.on("joinRoom", ({ username, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, username, room });
 
@@ -58,9 +52,18 @@ io.on("connection", (socket) => {
       return callback(error);
     }
 
+    // Empty room check
+    if (getUsersInRoom(room).length === 1) {
+      socket.to(room).emit("uploadVideo", "You need to upload a video");
+    } else {
+      const videoTitle = extractTitleFromRoomName(room);
+      socket.to(room).emit("sendVideo", videoTitle);
+      console.log(getUsersInRoom(room).length);
+    }
+
     socket.join(room);
     console.log(`User ${socket.id} joined room: ${username} ${room} `);
-    socket.to(room).emit("userJoined", `User ${socket.id} has joined the room`);
+    socket.to(room).emit("userJoined", `User ${username} has joined the room`);
   });
 
   socket.on("leaveRoom", (room) => {
@@ -69,10 +72,22 @@ io.on("connection", (socket) => {
     socket.to(room).emit("userLeft", `User ${socket.id} has left the room`);
   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected: " + socket.id);
+  socket.on("disconnect", () => {});
+
+  socket.on("uploadVideo", ({ room, videoTitle }) => {
+    console.log(room);
+    io.to(room).emit("videoUploaded", videoTitle);
   });
+
+  socket.on("requestVideo", () => {});
 });
+
+function extractTitleFromRoomName(roomName) {
+  // Example: Extracting title from file name
+  // Implement according to your file naming convention
+  const title = roomName.split(".")[0]; // Simple example, just taking the file name without extension
+  return title;
+}
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import io from "socket.io-client";
+import React, { useState, useEffect, useContext } from "react";
 
+import SocketContext from "./components/SocketProvider";
 import Form from "./components/Form";
 import VideoPlayerScreen from "./screens/VideoPlayerScreen";
 
-const socket = io("http://localhost:3001");
-
 function App() {
+  const socket = useContext(SocketContext);
+
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [userJoined, setUserJoined] = useState(false);
@@ -52,7 +52,7 @@ function App() {
       {!userJoined ? (
         <Form onFormSubmit={handleFormSubmit} />
       ) : (
-        <VideoPlayerScreen />
+        <VideoPlayerScreen room={room} />
       )}
     </div>
   );

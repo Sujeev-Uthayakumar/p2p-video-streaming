@@ -1,23 +1,23 @@
-import * as React from "react";
-import { styled } from "@mui/material/styles";
-import Button from "@mui/material/Button";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
+import SocketContext from "./SocketProvider";
 
-function InputFileUpload() {
-  const [selectedFile, setSelectedFile] = React.useState(null);
+function InputFileUpload({ room }) {
+  const socket = useContext(SocketContext);
+
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  useEffect(() => {
+    socket.on("videoUploaded", (videoTitle) => {
+      console.log("dawdad");
+      alert(videoTitle);
+    });
+
+    return () => {
+      socket.off("videoUploaded");
+    };
+  }, []);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -28,9 +28,9 @@ function InputFileUpload() {
       alert("Please select a file first!");
       return;
     }
-
+    const newFileName = `${room}.${selectedFile.type.split("/")[1]}`;
     const formData = new FormData();
-    formData.append("video", selectedFile);
+    formData.append("video", selectedFile, newFileName);
 
     try {
       const response = await axios.post(
@@ -44,6 +44,7 @@ function InputFileUpload() {
       );
       if (response.status === 200) {
         alert("Video uploaded successfully");
+        socket.emit("uploadVideo", { room, videoTitle: newFileName });
       } else {
         alert("Upload failed");
       }
