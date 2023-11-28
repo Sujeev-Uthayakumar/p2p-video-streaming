@@ -1,17 +1,26 @@
 const express = require("express");
 const app = express();
-const fs = require("fs");
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
+const { v4: uuidv4 } = require("uuid");
 
-const PORT = env.process.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
-app.get("/", function (req, res) {
-  res.send("Hello World");
+app.set("view engine", "ejs");
+app.use(express.static("public"));
+
+app.get("/", (req, res) => {
+  res.redirect(`/${uuidv4()}`);
 });
 
-app.get("/video", function (req, res) {});
-
-app.post("/upload", function (req, res) {});
-
-app.listen(PORT, function () {
-  console.log(`Listening on port ${PORT}`);
+app.get("/:room", (req, res) => {
+  res.render("room", { roomId: req.params.room });
 });
+
+io.on("connection", (socket) => {
+  socket.on("join-room", (roomId, userId) => {
+    console.log(roomId, userId);
+  });
+});
+
+server.listen(PORT);
