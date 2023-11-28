@@ -18,9 +18,6 @@ function App() {
   };
 
   useEffect(() => {
-    socket.on("userJoined", (msg) => {
-      alert(msg);
-    });
 
     socket.on("userLeft", (msg) => {
       setUserJoined(false);

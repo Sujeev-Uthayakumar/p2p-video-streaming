@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 
 import SocketContext from "./SocketProvider";
@@ -7,17 +7,6 @@ function InputFileUpload({ room }) {
   const socket = useContext(SocketContext);
 
   const [selectedFile, setSelectedFile] = useState(null);
-
-  useEffect(() => {
-    socket.on("videoUploaded", (videoTitle) => {
-      console.log("dawdad");
-      alert(videoTitle);
-    });
-
-    return () => {
-      socket.off("videoUploaded");
-    };
-  }, []);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);

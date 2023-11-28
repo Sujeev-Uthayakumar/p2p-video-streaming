@@ -1,4 +1,5 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
+import ReactPlayer from "react-player";
 
 import InputFileUpload from "../components/InputFileUpload";
 import SocketContext from "../components/SocketProvider";
@@ -6,24 +7,28 @@ import SocketContext from "../components/SocketProvider";
 const VideoPlayerScreen = ({ room }) => {
   const socket = useContext(SocketContext);
 
+  const [needVideo, setNeedVideo] = useState(null);
+
   useEffect(() => {
-    socket.on("sendVideo", (msg) => {
-      alert(msg);
+    socket.on("userJoined", (needVideo) => {
+      setNeedVideo(needVideo);
     });
 
-    socket.on("requestVideo", (videoTitle) => {
+    socket.on("videoUploaded", (videoTitle) => {
+      console.log("dawdad");
       alert(videoTitle);
     });
 
     return () => {
-      socket.off("videoUpload");
-      socket.off("videoSent");
+      socket.off("videoUploaded");
+      socket.off("userJoined");
     };
-  }, []);
+  });
 
   return (
     <div>
-      <InputFileUpload room={room} />
+      <ReactPlayer url="https://www.youtube.com/watch?v=LXb3EKWsInQ" />
+      {needVideo ? <InputFileUpload room={room} /> : null}
     </div>
   );
 };
