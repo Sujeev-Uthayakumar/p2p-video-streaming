@@ -1,17 +1,25 @@
 const express = require("express");
 const http = require("http");
+const multer = require("multer");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom,
+} = require("./utils/users");
+
 const app = express();
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
-const PORT = process.env.PORT || 5000;
-
-// Configure multer for video file storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
@@ -26,36 +34,46 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Middleware
+const PORT = 3001;
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(cors());
 
-// Routes
 app.post("/upload", upload.single("video"), (req, res) => {
+  console.log(req.file);
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
-  return res.send("Video Uploaded Successfully!");
+  return res.status(200).send("File uploaded successfully.");
 });
 
 io.on("connection", (socket) => {
-  socket.emit("me", socket.id);
+  console.log("A user connected: " + socket.id);
+
+  socket.on("joinRoom", ({ username, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, username, room });
+
+    if (error) {
+      return callback(error);
+    }
+
+    socket.join(room);
+    console.log(`User ${socket.id} joined room: ${username} ${room} `);
+    socket.to(room).emit("userJoined", `User ${socket.id} has joined the room`);
+  });
+
+  socket.on("leaveRoom", (room) => {
+    socket.leave(room);
+    console.log(`User ${socket.id} left room: ${room}`);
+    socket.to(room).emit("userLeft", `User ${socket.id} has left the room`);
+  });
 
   socket.on("disconnect", () => {
-    socket.broadcast.emit("stream-ended");
-  });
-
-  socket.on("join-room", (data) => {
-    io.to(data.userToCall).emit("callUser", {
-      signal: data.signalData,
-      from: data.from,
-      name: data.name,
-    });
-  });
-
-  socket.on("", (data) => {
-    io.to(data.to).emit("callAccepted", data.signal);
+    console.log("User disconnected: " + socket.id);
   });
 });
 
-server.listen(PORT, () => console.log("server is running on port 5000"));
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

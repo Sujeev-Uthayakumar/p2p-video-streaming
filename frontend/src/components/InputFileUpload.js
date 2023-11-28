@@ -2,6 +2,7 @@ import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import axios from "axios";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -16,15 +17,47 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 function InputFileUpload() {
+  const [selectedFile, setSelectedFile] = React.useState(null);
+
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("Please select a file first!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("video", selectedFile);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (response.status === 200) {
+        alert("Video uploaded successfully");
+      } else {
+        alert("Upload failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Upload error");
+    }
+  };
+
   return (
-    <Button
-      component="label"
-      variant="contained"
-      startIcon={<CloudUploadIcon />}
-    >
-      Upload file
-      <VisuallyHiddenInput type="file" />
-    </Button>
+    <div>
+      <input type="file" accept="video/*" onChange={handleFileChange} />
+      <button onClick={handleUpload}>Upload Video</button>
+    </div>
   );
 }
 
