@@ -1,22 +1,23 @@
 import React, { useEffect, useContext, useState } from "react";
 import ReactPlayer from "react-player";
 import axios from "axios";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 import InputFileUpload from "../components/InputFileUpload";
 import SocketContext from "../components/SocketProvider";
+import Header from "../components/Header";
 
 const VideoPlayerScreen = ({ room, username }) => {
   const socket = useContext(SocketContext);
 
-  const [needVideo, setNeedVideo] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     socket.on("userJoined", ({ needVideo, roomData }) => {
-      console.log(roomData);
+      console.log(needVideo);
       const { video, owner } = roomData;
-      setNeedVideo(needVideo);
       if (video) {
         console.log(video);
         getVideo(video);
@@ -48,7 +49,33 @@ const VideoPlayerScreen = ({ room, username }) => {
 
   return (
     <div>
-      <ReactPlayer url={videoUrl} controls={true} />
+      <Header room={room} username={username} />
+      {videoUrl ? (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "100px",
+          }}
+        >
+          <ReactPlayer url={videoUrl} controls={true} />
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            height: "75vh",
+          }}
+        >
+          <CircularProgress />
+          <Box sx={{ padding: "20px" }}>Waiting for video...</Box>
+        </Box>
+      )}
+
       {isOwner ? <InputFileUpload room={room} /> : null}
     </div>
   );

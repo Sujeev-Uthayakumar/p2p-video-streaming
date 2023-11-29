@@ -55,7 +55,6 @@ app.get("/video/:filename", (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(__dirname, "uploads", filename);
 
-  res.type("video/mp4");
   res.sendFile(filePath, (err) => {
     if (err) {
       console.log(err);
