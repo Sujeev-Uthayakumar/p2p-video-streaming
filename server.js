@@ -3,6 +3,7 @@ const http = require("http");
 const multer = require("multer");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const path = require("path");
 
 const {
   addUser,
@@ -10,6 +11,12 @@ const {
   getUser,
   getUsersInRoom,
 } = require("./utils/users");
+const {
+  addRoom,
+  removeRoom,
+  getRoom,
+  addVideoToRoom,
+} = require("./utils/rooms");
 
 const app = express();
 const server = http.createServer(app);
@@ -44,6 +51,19 @@ app.post("/upload", upload.single("video"), (req, res) => {
   return res.status(200).send("File uploaded successfully.");
 });
 
+app.get("/video/:filename", (req, res) => {
+  const { filename } = req.params;
+  const filePath = path.join(__dirname, "uploads", filename);
+
+  res.type("video/mp4");
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.log(err);
+      res.status(404).send("Sorry, can't find that file!");
+    }
+  });
+});
+
 io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, username, room });
@@ -52,18 +72,16 @@ io.on("connection", (socket) => {
       return callback(error);
     }
 
-    // Empty room check
-    if (getUsersInRoom(room).length === 1) {
-      socket.to(room).emit("uploadVideo", "You need to upload a video");
-    } else {
-      const videoTitle = extractTitleFromRoomName(room);
-      socket.to(room).emit("sendVideo", videoTitle);
-      console.log(getUsersInRoom(room).length);
+    if (!getRoom(room)) {
+      addRoom(room, username);
     }
 
     socket.join(room);
     console.log(`User ${socket.id} joined room: ${username} ${room} `);
-    socket.to(room).emit("userJoined", `User ${username} has joined the room`);
+    io.to(room).emit("userJoined", {
+      needVideo: getUsersInRoom(room).length === 1 ? true : false,
+      roomData: getRoom(room),
+    });
   });
 
   socket.on("leaveRoom", (room) => {
@@ -75,19 +93,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {});
 
   socket.on("uploadVideo", ({ room, videoTitle }) => {
-    console.log(room);
-    io.to(room).emit("videoUploaded", videoTitle);
+    addVideoToRoom(room, videoTitle);
+    io.to(room).emit("videoUploaded", getRoom(room));
   });
 
   socket.on("requestVideo", () => {});
 });
-
-function extractTitleFromRoomName(roomName) {
-  // Example: Extracting title from file name
-  // Implement according to your file naming convention
-  const title = roomName.split(".")[0]; // Simple example, just taking the file name without extension
-  return title;
-}
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
