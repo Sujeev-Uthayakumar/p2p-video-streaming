@@ -81,7 +81,7 @@ const HomePage = () => {
           sx={{ p: 3, width: "100%", mb: 5, paddingTop: 10 }}
         >
           <Typography variant="h5" align="center" gutterBottom>
-            Join a Vide Stream Room
+            Join a Video Stream
           </Typography>
           <Box
             component="form"
