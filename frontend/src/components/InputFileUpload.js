@@ -13,14 +13,18 @@ import DialogTitle from "@mui/material/DialogTitle";
 
 import SocketContext from "./SocketProvider";
 
-function InputFileUpload({ room }) {
+function InputFileUpload({ room, isOwner }) {
   const socket = useContext(SocketContext);
 
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [videoTitle, setVideoTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [error, setError] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
+    setError(false);
   };
 
   const handleClose = () => {
@@ -33,9 +37,10 @@ function InputFileUpload({ room }) {
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      alert("Please select a file first!");
+      setError(true);
       return;
     }
+
     const newFileName = `${room}.${selectedFile.type.split("/")[1]}`;
     const formData = new FormData();
     formData.append("video", selectedFile, newFileName);
@@ -60,6 +65,7 @@ function InputFileUpload({ room }) {
       console.error("Error:", error);
       alert("Upload error");
     }
+    setOpen(false);
   };
 
   return (
@@ -78,33 +84,41 @@ function InputFileUpload({ room }) {
         <DialogTitle>Upload Video</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
+            To upload a video to stream to others, please enter the title and
+            description here.
           </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
-            id="name"
+            id="title"
             label="Video Title"
-            type="email"
             fullWidth
             variant="standard"
+            value={videoTitle}
+            onChange={(e) => setVideoTitle(e.target.value)}
+            error={videoTitle === ""}
           />
           <TextField
             autoFocus
             margin="dense"
-            id="name"
+            id="description"
             label="Description"
-            type="email"
             fullWidth
             variant="standard"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            error={description === ""}
           />
-          <input type="file" accept="video/*" onChange={handleFileChange} />
-          <button onClick={handleUpload}>Upload Video</button>
+          <Box sx={{ marginTop: "20px" }}>
+            <input type="file" accept="video/*" onChange={handleFileChange} />
+          </Box>
+          <DialogContentText sx={{ marginTop: "5px" }} color="error">
+            {error ? "Please add a video to upload" : ""}
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Upload</Button>
+          <Button onClick={handleUpload}>Upload</Button>
         </DialogActions>
       </Dialog>
     </div>

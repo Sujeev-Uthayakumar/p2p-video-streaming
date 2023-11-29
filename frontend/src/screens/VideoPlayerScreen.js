@@ -3,12 +3,13 @@ import ReactPlayer from "react-player";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import Text from "@mui/material/Typography";
 
 import InputFileUpload from "../components/InputFileUpload";
 import SocketContext from "../components/SocketProvider";
 import Header from "../components/Header";
 
-const VideoPlayerScreen = ({ room, username }) => {
+const VideoPlayerScreen = ({ room, username, resetUser }) => {
   const socket = useContext(SocketContext);
 
   const [videoUrl, setVideoUrl] = useState(null);
@@ -30,14 +31,13 @@ const VideoPlayerScreen = ({ room, username }) => {
     socket.on("videoUploaded", (roomData) => {
       const { video } = roomData;
       getVideo(video);
-      alert(video);
     });
 
     return () => {
       socket.off("videoUploaded");
       socket.off("userJoined");
     };
-  });
+  }, []);
 
   const getVideo = async (videoTitle) => {
     const response = await axios.get(
@@ -49,17 +49,28 @@ const VideoPlayerScreen = ({ room, username }) => {
 
   return (
     <div>
-      <Header room={room} username={username} />
+      <Header resetUser={resetUser} room={room} username={username} />
       {videoUrl ? (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "100px",
-          }}
-        >
-          <ReactPlayer url={videoUrl} controls={true} />
+        <Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingTop: "100px",
+            }}
+          >
+            <ReactPlayer url={videoUrl} controls={true} />
+          </Box>
+          <Box
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text>Title</Text>
+            <Text>Description</Text>
+          </Box>
         </Box>
       ) : (
         <Box

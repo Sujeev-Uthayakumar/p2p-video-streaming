@@ -17,7 +17,6 @@ function App() {
   const [room, setRoom] = useState("");
   const [userJoined, setUserJoined] = useState(false);
   const [open, setOpen] = useState(false);
-  const [needVideo, setNeedVideo] = useState(null);
 
   const handleFormSubmit = (username, room) => {
     setUsername(username);
@@ -27,26 +26,19 @@ function App() {
 
   useEffect(() => {
     socket.on("userLeft", (msg) => {
-      setUserJoined(false);
       alert(msg);
     });
 
     return () => {
       socket.off("userLeft");
     };
-  });
+  }, []);
 
   const createAndJoinRoom = () => {
     if (room !== "") {
       socket.emit("joinRoom", { username, room });
       setUserJoined(true);
       setOpen(true);
-    }
-  };
-
-  const leaveRoom = () => {
-    if (room !== "") {
-      socket.emit("leaveRoom", room);
     }
   };
 
@@ -57,7 +49,12 @@ function App() {
 
     setOpen(false);
   };
-  console.log(needVideo);
+
+  const resetUser = () => {
+    setUsername("");
+    setRoom("");
+    setUserJoined(false);
+  };
 
   return (
     <div>
@@ -69,7 +66,11 @@ function App() {
       {!userJoined ? (
         <Form onFormSubmit={handleFormSubmit} />
       ) : (
-        <VideoPlayerScreen room={room} username={username} />
+        <VideoPlayerScreen
+          resetUser={resetUser}
+          room={room}
+          username={username}
+        />
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -13,12 +13,22 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 
-const pages = ["Home", "Streams"];
-const settings = ["Profile", "Account", "Users", "Leave Room"];
+import SocketContext from "./SocketProvider";
 
-function Header({ username, room }) {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+const pages = ["Home", "Streams"];
+
+function Header({ room, username, resetUser }) {
+  const socket = useContext(SocketContext);
+
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+
+  const handleLeaveRoom = () => {
+    if (room !== "") {
+      socket.emit("leaveRoom", { room, username });
+    }
+    resetUser();
+  };
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -34,6 +44,13 @@ function Header({ username, room }) {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const settings = [
+    { name: "Profile", callback: () => handleCloseNavMenu() },
+    { name: "Account", callback: () => handleCloseNavMenu() },
+    { name: "Users", callback: () => handleCloseNavMenu() },
+    { name: "Leave Room", callback: () => handleLeaveRoom() },
+  ];
 
   return (
     <AppBar position="static">
@@ -129,8 +146,8 @@ function Header({ username, room }) {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                <MenuItem key={setting.name} onClick={setting.callback}>
+                  <Typography textAlign="center">{setting.name}</Typography>
                 </MenuItem>
               ))}
             </Menu>

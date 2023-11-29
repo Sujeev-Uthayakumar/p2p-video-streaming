@@ -83,10 +83,11 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("leaveRoom", (room) => {
+  socket.on("leaveRoom", ({ room, username }) => {
+    removeUser(username);
     socket.leave(room);
-    console.log(`User ${socket.id} left room: ${room}`);
-    socket.to(room).emit("userLeft", `User ${socket.id} has left the room`);
+    console.log(`User ${username} left room: ${room}`);
+    io.to(room).emit("userLeft", `User ${username} has left the room`);
   });
 
   socket.on("disconnect", () => {});
@@ -95,8 +96,6 @@ io.on("connection", (socket) => {
     addVideoToRoom(room, videoTitle);
     io.to(room).emit("videoUploaded", getRoom(room));
   });
-
-  socket.on("requestVideo", () => {});
 });
 
 server.listen(PORT, () => {
