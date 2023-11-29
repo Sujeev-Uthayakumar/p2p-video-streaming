@@ -3,7 +3,6 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
 import SocketContext from "./components/SocketProvider";
-import Form from "./components/Form";
 import VideoPlayerScreen from "./screens/VideoPlayerScreen";
 import HomePage from "./screens/HomePageScreen";
 
@@ -22,7 +21,7 @@ function App() {
   const handleFormSubmit = (username, room) => {
     setUsername(username);
     setRoom(room);
-    createAndJoinRoom();
+    createAndJoinRoom(username, room);
   };
 
   useEffect(() => {
@@ -35,7 +34,7 @@ function App() {
     };
   }, []);
 
-  const createAndJoinRoom = () => {
+  const createAndJoinRoom = (username, room) => {
     if (room !== "") {
       socket.emit("joinRoom", { username, room });
       setUserJoined(true);
@@ -65,8 +64,7 @@ function App() {
         </Alert>
       </Snackbar>
       {!userJoined ? (
-        // <Form onFormSubmit={handleFormSubmit} />
-        <HomePage />
+        <HomePage onFormSubmit={handleFormSubmit} />
       ) : (
         <VideoPlayerScreen
           resetUser={resetUser}

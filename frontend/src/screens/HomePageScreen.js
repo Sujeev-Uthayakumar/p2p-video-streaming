@@ -7,34 +7,29 @@ import {
   Typography,
   Box,
   Paper,
-  Avatar,
   CssBaseline,
-  Link,
   AppBar,
   Toolbar,
-  IconButton,
 } from "@mui/material";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import MenuIcon from "@mui/icons-material/Menu";
+
 import ScrollableRoomList from "../components/ScrollableRoomList"; // Import the new component
 
-const HomePage = () => {
-  const [roomId, setRoomId] = useState("");
+const HomePage = ({ onFormSubmit }) => {
+  const [room, setRoom] = useState("");
   const [username, setUsername] = useState("");
-  const [error, setError] = useState({ roomId: false, username: false });
+  const [error, setError] = useState({ room: false, username: false });
 
   const validateInput = () => {
     setError({
-      roomId: roomId.trim() === "",
+      room: room.trim() === "",
       username: username.trim() === "",
     });
-    return roomId.trim() !== "" && username.trim() !== "";
+    return room.trim() !== "" && username.trim() !== "";
   };
 
   const handleSubmit = () => {
     if (validateInput()) {
-      // Implement your submit logic here
-      console.log("Room ID:", roomId, "Username:", username);
+      onFormSubmit(username, room);
     }
   };
 
@@ -93,13 +88,13 @@ const HomePage = () => {
             autoComplete="off"
           >
             <TextField
-              error={error.roomId}
-              helperText={error.roomId ? "Room ID is required" : ""}
+              error={error.room}
+              helperText={error.room ? "Room ID is required" : ""}
               required
               id="room-id"
               label="Room ID"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
+              value={room}
+              onChange={(e) => setRoom(e.target.value)}
             />
             <TextField
               error={error.username}
@@ -110,7 +105,11 @@ const HomePage = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleSubmit()}
+            >
               Join Room
             </Button>
           </Box>
