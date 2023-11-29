@@ -5,19 +5,14 @@ import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 
 import SocketContext from "./SocketProvider";
 
-const pages = ["Home", "Streams"];
-
-function Header({ room, username, resetUser }) {
+function Header({ room, username, resetUser, isOwner }) {
   const socket = useContext(SocketContext);
 
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -28,6 +23,9 @@ function Header({ room, username, resetUser }) {
       socket.emit("leaveRoom", { room, username });
     }
     resetUser();
+    if (isOwner) {
+      socket.emit("deleteRoom", { room });
+    }
   };
 
   const handleOpenNavMenu = (event) => {
@@ -53,7 +51,7 @@ function Header({ room, username, resetUser }) {
   ];
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ boxShadow: "none" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>

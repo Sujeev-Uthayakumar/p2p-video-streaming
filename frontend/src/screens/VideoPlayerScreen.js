@@ -3,11 +3,11 @@ import ReactPlayer from "react-player";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import Text from "@mui/material/Typography";
 
 import InputFileUpload from "../components/InputFileUpload";
 import SocketContext from "../components/SocketProvider";
 import Header from "../components/Header";
+import CommentsList from "../components/CommentsList";
 
 const VideoPlayerScreen = ({ room, username, resetUser }) => {
   const socket = useContext(SocketContext);
@@ -49,27 +49,29 @@ const VideoPlayerScreen = ({ room, username, resetUser }) => {
 
   return (
     <div>
-      <Header resetUser={resetUser} room={room} username={username} />
+      <Header
+        resetUser={resetUser}
+        room={room}
+        username={username}
+        isOwner={isOwner}
+      />
       {videoUrl ? (
-        <Box>
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <CommentsList />
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
               justifyContent: "center",
               paddingTop: "100px",
+              flexGrow: 1,
             }}
           >
-            <ReactPlayer url={videoUrl} controls={true} />
-          </Box>
-          <Box
-            sx={{
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Text>Title</Text>
-            <Text>Description</Text>
+            <ReactPlayer
+              height={396}
+              width={704}
+              url={videoUrl}
+              controls={true}
+            />
           </Box>
         </Box>
       ) : (
