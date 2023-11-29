@@ -5,20 +5,24 @@ import axios from "axios";
 import InputFileUpload from "../components/InputFileUpload";
 import SocketContext from "../components/SocketProvider";
 
-const VideoPlayerScreen = ({ room }) => {
+const VideoPlayerScreen = ({ room, username }) => {
   const socket = useContext(SocketContext);
 
   const [needVideo, setNeedVideo] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     socket.on("userJoined", ({ needVideo, roomData }) => {
       console.log(roomData);
-      const { video } = roomData;
+      const { video, owner } = roomData;
       setNeedVideo(needVideo);
       if (video) {
         console.log(video);
         getVideo(video);
+      }
+      if (owner === username) {
+        setIsOwner(true);
       }
     });
 
@@ -45,7 +49,7 @@ const VideoPlayerScreen = ({ room }) => {
   return (
     <div>
       <ReactPlayer url={videoUrl} controls={true} />
-      {needVideo ? <InputFileUpload room={room} /> : null}
+      {isOwner ? <InputFileUpload room={room} /> : null}
     </div>
   );
 };

@@ -18,7 +18,6 @@ function App() {
   };
 
   useEffect(() => {
-
     socket.on("userLeft", (msg) => {
       setUserJoined(false);
       alert(msg);
@@ -49,7 +48,7 @@ function App() {
       {!userJoined ? (
         <Form onFormSubmit={handleFormSubmit} />
       ) : (
-        <VideoPlayerScreen room={room} />
+        <VideoPlayerScreen room={room} username={username} />
       )}
     </div>
   );
