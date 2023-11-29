@@ -51,7 +51,7 @@ function Header({ room, username, resetUser, isOwner }) {
   ];
 
   return (
-    <AppBar position="static" sx={{ boxShadow: "none" }}>
+    <AppBar position="static" sx={{ boxShadow: "none", maxHeight: "15vh" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>

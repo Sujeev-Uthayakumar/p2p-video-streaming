@@ -5,6 +5,7 @@ import MuiAlert from "@mui/material/Alert";
 import SocketContext from "./components/SocketProvider";
 import Form from "./components/Form";
 import VideoPlayerScreen from "./screens/VideoPlayerScreen";
+import HomePage from "./screens/HomePageScreen";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -64,7 +65,8 @@ function App() {
         </Alert>
       </Snackbar>
       {!userJoined ? (
-        <Form onFormSubmit={handleFormSubmit} />
+        // <Form onFormSubmit={handleFormSubmit} />
+        <HomePage />
       ) : (
         <VideoPlayerScreen
           resetUser={resetUser}
