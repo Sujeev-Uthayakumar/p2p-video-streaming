@@ -20,6 +20,7 @@ function App() {
   const [openError, setOpenError] = useState(false);
   const [openUploadSuccess, setUploadSuccess] = useState(false);
   const [openUploadError, setUploadError] = useState(false);
+  const [openRoomDeleted, setOpenRoomDeleted] = useState(false);
 
   const handleFormSubmit = (username, room) => {
     setUsername(username);
@@ -33,6 +34,7 @@ function App() {
     });
 
     socket.on("roomDeleted", (room) => {
+      setOpenRoomDeleted(true);
       resetUser();
     });
 
@@ -49,6 +51,7 @@ function App() {
         if (error) {
           isError = true;
           setUserJoined(false);
+          setOpenJoinedRoom(false);
           setOpenError(true);
         }
       });
@@ -65,6 +68,14 @@ function App() {
     }
 
     setOpenJoinedRoom(false);
+  };
+
+  const handleCloseRoomDeleted = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenRoomDeleted(false);
   };
 
   const handleCloseError = (event, reason) => {
@@ -157,6 +168,19 @@ function App() {
           sx={{ width: "100%" }}
         >
           The username is already taken
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openRoomDeleted}
+        autoHideDuration={1000}
+        onClose={handleCloseRoomDeleted}
+      >
+        <Alert
+          onClose={handleCloseRoomDeleted}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          The room was deleted
         </Alert>
       </Snackbar>
       {!userJoined ? (

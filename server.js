@@ -8,8 +8,9 @@ const path = require("path");
 const {
   addUser,
   removeUser,
-  getUser,
+  removeUsersInRoom,
   getUsersInRoom,
+  getAllUsers,
 } = require("./utils/users");
 const {
   addRoom,
@@ -73,6 +74,10 @@ app.get("/rooms", (req, res) => {
   res.send(getAllRooms("false"));
 });
 
+app.get("/users", (req, res) => {
+  res.send(getAllUsers());
+});
+
 io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, username, room });
@@ -97,7 +102,7 @@ io.on("connection", (socket) => {
     const roomData = getRoom(room);
     if (roomData.owner === username) {
       removeRoom(room);
-      removeUser(username);
+      removeUsersInRoom(room);
       socket.leave(room);
       io.to(room).emit("roomDeleted", room);
     } else {
