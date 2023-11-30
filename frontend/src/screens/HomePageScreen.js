@@ -1,5 +1,5 @@
 // HomePage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   TextField,
@@ -11,6 +11,7 @@ import {
   AppBar,
   Toolbar,
 } from "@mui/material";
+import axios from "axios";
 
 import ScrollableRoomList from "../components/ScrollableRoomList"; // Import the new component
 
@@ -18,6 +19,7 @@ const HomePage = ({ onFormSubmit }) => {
   const [room, setRoom] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState({ room: false, username: false });
+  const [availableRooms, setAvailableRooms] = useState([]);
 
   const validateInput = () => {
     setError({
@@ -33,20 +35,15 @@ const HomePage = ({ onFormSubmit }) => {
     }
   };
 
-  // Mock data for available rooms
-  const availableRooms = [
-    { id: "Room101", name: "General Chat" },
-    { id: "Room102", name: "Tech Talk" },
-    { id: "Room103", name: "Gaming Hub" },
-    { id: "Room101", name: "General Chat" },
-    { id: "Room102", name: "Tech Talk" },
-    { id: "Room103", name: "Gaming Hub" },
-    { id: "Room101", name: "General Chat" },
-    { id: "Room102", name: "Tech Talk" },
-    { id: "Room103", name: "Gaming Hub" },
+  useEffect(() => {
+    getAvailableRooms();
+  }, []);
 
-    // Add more rooms as needed
-  ];
+  const getAvailableRooms = async () => {
+    const response = await axios.get("http://localhost:3001/rooms");
+
+    setAvailableRooms(response.data);
+  };
 
   return (
     <div
@@ -116,7 +113,9 @@ const HomePage = ({ onFormSubmit }) => {
         </Paper>
 
         <Typography variant="h6" align="center" gutterBottom>
-          Available Rooms
+          {availableRooms.length !== 0
+            ? "Available Rooms"
+            : "No Public Rooms Available"}
         </Typography>
         <ScrollableRoomList rooms={availableRooms} />
       </Container>

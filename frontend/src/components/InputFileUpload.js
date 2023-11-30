@@ -10,16 +10,26 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 
 import SocketContext from "./SocketProvider";
 
-function InputFileUpload({ room, isOwner }) {
+function InputFileUpload({
+  room,
+  isOwner,
+  handleUploadError,
+  handleUploadSuccess,
+}) {
   const socket = useContext(SocketContext);
 
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [videoTitle, setVideoTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [isPrivate, setIsPrivate] = useState(null);
   const [error, setError] = useState(false);
 
   const handleClickOpen = () => {
@@ -35,6 +45,10 @@ function InputFileUpload({ room, isOwner }) {
     setSelectedFile(event.target.files[0]);
   };
 
+  const handleChange = (event) => {
+    setIsPrivate(event.target.value);
+  };
+
   const handleUpload = async () => {
     if (!selectedFile) {
       setError(true);
@@ -44,6 +58,10 @@ function InputFileUpload({ room, isOwner }) {
     const newFileName = `${room}.${selectedFile.type.split("/")[1]}`;
     const formData = new FormData();
     formData.append("video", selectedFile, newFileName);
+    formData.append("title", videoTitle);
+    formData.append("description", description);
+    formData.append("room", room);
+    formData.append("isPrivate", isPrivate);
 
     try {
       const response = await axios.post(
@@ -56,14 +74,13 @@ function InputFileUpload({ room, isOwner }) {
         }
       );
       if (response.status === 200) {
-        alert("Video uploaded successfully");
         socket.emit("uploadVideo", { room, videoTitle: newFileName });
+        handleUploadSuccess();
       } else {
-        alert("Upload failed");
+        handleUploadError();
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Upload error");
+      handleUploadError();
     }
     setOpen(false);
   };
@@ -109,6 +126,22 @@ function InputFileUpload({ room, isOwner }) {
             onChange={(e) => setDescription(e.target.value)}
             error={description === ""}
           />
+          <FormControl
+            sx={{ marginTop: 1, minWidth: 120 }}
+            error={isPrivate === null}
+          >
+            <InputLabel id="demo-simple-select-label">Privacy</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={isPrivate}
+              label="Privacy"
+              onChange={handleChange}
+            >
+              <MenuItem value={true}>Private</MenuItem>
+              <MenuItem value={false}>Public</MenuItem>
+            </Select>
+          </FormControl>
           <Box sx={{ marginTop: "20px" }}>
             <input type="file" accept="video/*" onChange={handleFileChange} />
           </Box>
@@ -118,7 +151,7 @@ function InputFileUpload({ room, isOwner }) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleUpload}>Upload</Button>
+          <Button onClick={() => handleUpload()}>Upload</Button>
         </DialogActions>
       </Dialog>
     </div>

@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Paper,
-  IconButton,
-  InputAdornment,
-} from "@mui/material";
+import { TextField, IconButton, InputAdornment } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
 const MessageInput = ({ onSendMessage }) => {
@@ -33,7 +27,13 @@ const MessageInput = ({ onSendMessage }) => {
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
-            <IconButton type="submit" sx={{ p: "10px" }} aria-label="send">
+            <IconButton
+              type="submit"
+              sx={{ p: "10px" }}
+              aria-label="send"
+              disabled={message === ""}
+              onClick={handleSubmit}
+            >
               <SendIcon />
             </IconButton>
           </InputAdornment>

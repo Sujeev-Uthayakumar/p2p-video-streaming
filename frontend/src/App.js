@@ -16,7 +16,10 @@ function App() {
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [userJoined, setUserJoined] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [openJoinedRoom, setOpenJoinedRoom] = useState(false);
+  const [openError, setOpenError] = useState(false);
+  const [openUploadSuccess, setUploadSuccess] = useState(false);
+  const [openUploadError, setUploadError] = useState(false);
 
   const handleFormSubmit = (username, room) => {
     setUsername(username);
@@ -26,7 +29,11 @@ function App() {
 
   useEffect(() => {
     socket.on("userLeft", (msg) => {
-      alert(msg);
+      // alert(msg);
+    });
+
+    socket.on("roomDeleted", (room) => {
+      resetUser();
     });
 
     return () => {
@@ -36,18 +43,60 @@ function App() {
 
   const createAndJoinRoom = (username, room) => {
     if (room !== "") {
-      socket.emit("joinRoom", { username, room });
-      setUserJoined(true);
-      setOpen(true);
+      let isError = false;
+
+      socket.emit("joinRoom", { username, room }, (error) => {
+        if (error) {
+          isError = true;
+          setUserJoined(false);
+          setOpenError(true);
+        }
+      });
+      if (!isError) {
+        setUserJoined(true);
+        setOpenJoinedRoom(true);
+      }
     }
   };
 
-  const handleClose = (event, reason) => {
+  const handleCloseJoinedRoom = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
 
-    setOpen(false);
+    setOpenJoinedRoom(false);
+  };
+
+  const handleCloseError = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpenError(false);
+  };
+
+  const handleCloseUploadSuccess = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setUploadSuccess(false);
+  };
+
+  const handleCloseUploadError = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setUploadError(false);
+  };
+
+  const handleUploadSuccess = () => {
+    setUploadSuccess(true);
+  };
+
+  const handleUploadError = () => {
+    setUploadError(true);
   };
 
   const resetUser = () => {
@@ -58,15 +107,64 @@ function App() {
 
   return (
     <div>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+      <Snackbar
+        open={openJoinedRoom}
+        autoHideDuration={1000}
+        onClose={handleCloseJoinedRoom}
+      >
+        <Alert
+          onClose={handleCloseJoinedRoom}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
           Successfully entered room: {room}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openUploadError}
+        autoHideDuration={1000}
+        onClose={handleCloseUploadError}
+      >
+        <Alert
+          onClose={handleCloseUploadError}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Uploading the video failed
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openUploadSuccess}
+        autoHideDuration={1000}
+        onClose={handleCloseUploadSuccess}
+      >
+        <Alert
+          onClose={handleCloseUploadSuccess}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Upload successful
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openError}
+        autoHideDuration={1000}
+        onClose={handleCloseError}
+      >
+        <Alert
+          onClose={handleCloseError}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          The username is already taken
         </Alert>
       </Snackbar>
       {!userJoined ? (
         <HomePage onFormSubmit={handleFormSubmit} />
       ) : (
         <VideoPlayerScreen
+          handleUploadError={handleUploadError}
+          handleUploadSuccess={handleUploadSuccess}
           resetUser={resetUser}
           room={room}
           username={username}

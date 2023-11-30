@@ -13,9 +13,11 @@ const {
 } = require("./utils/users");
 const {
   addRoom,
+  getAllRooms,
   removeRoom,
   getRoom,
   addVideoToRoom,
+  changeRoomDetails,
 } = require("./utils/rooms");
 
 const app = express();
@@ -45,6 +47,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.post("/upload", upload.single("video"), (req, res) => {
+  const { room, isPrivate, title, description } = req.body;
+  console.log(req);
+  console.log(getRoom("test"));
+  changeRoomDetails(room, isPrivate, title, description);
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -61,6 +67,10 @@ app.get("/video/:filename", (req, res) => {
       res.status(404).send("Sorry, can't find that file!");
     }
   });
+});
+
+app.get("/rooms", (req, res) => {
+  res.send(getAllRooms("false"));
 });
 
 io.on("connection", (socket) => {
@@ -84,17 +94,32 @@ io.on("connection", (socket) => {
   });
 
   socket.on("leaveRoom", ({ room, username }) => {
-    removeUser(username);
-    socket.leave(room);
-    console.log(`User ${username} left room: ${room}`);
-    io.to(room).emit("userLeft", `User ${username} has left the room`);
+    const roomData = getRoom(room);
+    if (roomData.owner === username) {
+      removeRoom(room);
+      removeUser(username);
+      socket.leave(room);
+      io.to(room).emit("roomDeleted", room);
+    } else {
+      removeUser(username);
+      socket.leave(room);
+      console.log(`User ${username} left room: ${room}`);
+      io.to(room).emit("userLeft", `User ${username} has left the room`);
+    }
   });
 
-  socket.on("disconnect", () => {});
+  socket.on("disconnect", () => {
+    console.log("test");
+  });
 
   socket.on("uploadVideo", ({ room, videoTitle }) => {
     addVideoToRoom(room, videoTitle);
     io.to(room).emit("videoUploaded", getRoom(room));
+  });
+
+  socket.on("sendComment", ({ username, message, room }) => {
+    console.log(username, message, room);
+    io.to(room).emit("comment", { username, message });
   });
 });
 

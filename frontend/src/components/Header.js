@@ -22,10 +22,10 @@ function Header({ room, username, resetUser, isOwner }) {
     if (room !== "") {
       socket.emit("leaveRoom", { room, username });
     }
-    resetUser();
     if (isOwner) {
       socket.emit("deleteRoom", { room });
     }
+    resetUser();
   };
 
   const handleOpenNavMenu = (event) => {
@@ -44,9 +44,9 @@ function Header({ room, username, resetUser, isOwner }) {
   };
 
   const settings = [
-    { name: "Profile", callback: () => handleCloseNavMenu() },
-    { name: "Account", callback: () => handleCloseNavMenu() },
-    { name: "Users", callback: () => handleCloseNavMenu() },
+    // { name: "Profile", callback: () => handleCloseNavMenu() },
+    // { name: "Account", callback: () => handleCloseNavMenu() },
+    // { name: "Users", callback: () => handleCloseNavMenu() },
     { name: "Leave Room", callback: () => handleLeaveRoom() },
   ];
 

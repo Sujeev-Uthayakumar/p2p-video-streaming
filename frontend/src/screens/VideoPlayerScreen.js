@@ -3,24 +3,35 @@ import ReactPlayer from "react-player";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import { Typography } from "@mui/material";
 
 import InputFileUpload from "../components/InputFileUpload";
 import SocketContext from "../components/SocketProvider";
 import Header from "../components/Header";
 import CommentsList from "../components/CommentsList";
 
-const VideoPlayerScreen = ({ room, username, resetUser }) => {
+const VideoPlayerScreen = ({
+  room,
+  username,
+  resetUser,
+  handleUploadError,
+  handleUploadSuccess,
+}) => {
   const socket = useContext(SocketContext);
 
   const [videoUrl, setVideoUrl] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
+  const [videoTitle, setVideoTitle] = useState("");
+  const [videoDescription, setVideoDescription] = useState("");
 
   useEffect(() => {
     socket.on("userJoined", ({ needVideo, roomData }) => {
       console.log(needVideo);
-      const { video, owner } = roomData;
+      const { video, owner, title, description } = roomData;
       if (video) {
         console.log(video);
+        setVideoTitle(title);
+        setVideoDescription(description);
         getVideo(video);
       }
       if (owner === username) {
@@ -29,7 +40,9 @@ const VideoPlayerScreen = ({ room, username, resetUser }) => {
     });
 
     socket.on("videoUploaded", (roomData) => {
-      const { video } = roomData;
+      const { video, title, description } = roomData;
+      setVideoTitle(title);
+      setVideoDescription(description);
       getVideo(video);
     });
 
@@ -57,21 +70,24 @@ const VideoPlayerScreen = ({ room, username, resetUser }) => {
       />
       {videoUrl ? (
         <Box sx={{ display: "flex", flexDirection: "row" }}>
-          <CommentsList />
+          <CommentsList username={username} room={room} />
           <Box
             sx={{
               display: "flex",
-              justifyContent: "center",
+              flexDirection: "column",
               paddingTop: "100px",
               flexGrow: 1,
             }}
           >
-            <ReactPlayer
-              height={396}
-              width={704}
-              url={videoUrl}
-              controls={true}
-            />
+            <Box
+              sx={{ display: "flex", justifyContent: "center", padding: "0" }}
+            >
+              <ReactPlayer url={videoUrl} controls={true} />
+            </Box>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography variant="h6">{videoTitle}</Typography>
+              <Typography>{videoDescription}</Typography>
+            </Box>
           </Box>
         </Box>
       ) : (
@@ -89,7 +105,13 @@ const VideoPlayerScreen = ({ room, username, resetUser }) => {
         </Box>
       )}
 
-      {isOwner ? <InputFileUpload room={room} /> : null}
+      {isOwner ? (
+        <InputFileUpload
+          handleUploadError={handleUploadError}
+          handleUploadSuccess={handleUploadSuccess}
+          room={room}
+        />
+      ) : null}
     </div>
   );
 };
