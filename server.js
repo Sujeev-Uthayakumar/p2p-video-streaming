@@ -85,7 +85,7 @@ io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, username, room });
     myBlockChain.addBlock({ username, room });
-    console.log(myBlockChain.isChainValid());
+    console.log("Blockchain is valid: " + myBlockChain.isChainValid());
 
     if (error) {
       return callback(error);
@@ -96,7 +96,7 @@ io.on("connection", (socket) => {
     }
 
     socket.join(room);
-    console.log(`User ${socket.id} joined room: ${username} ${room} `);
+    console.log(`User ${username} joined room: ${room}`);
     io.to(room).emit("userJoined", {
       needVideo: getUsersInRoom(room).length === 1 ? true : false,
       roomData: getRoom(room),
@@ -118,9 +118,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", () => {
-    console.log("test");
-  });
+  socket.on("disconnect", () => {});
 
   socket.on("uploadVideo", ({ room, videoTitle }) => {
     addVideoToRoom(room, videoTitle);
