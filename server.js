@@ -20,6 +20,7 @@ const {
   addVideoToRoom,
   changeRoomDetails,
 } = require("./utils/rooms");
+const { Blockchain, Block } = require("./utils/crypto/Blockchain");
 
 const app = express();
 const server = http.createServer(app);
@@ -38,6 +39,8 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
+
+const myBlockChain = new Blockchain();
 
 const upload = multer({ storage: storage });
 
@@ -81,6 +84,8 @@ app.get("/users", (req, res) => {
 io.on("connection", (socket) => {
   socket.on("joinRoom", ({ username, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, username, room });
+    myBlockChain.addBlock({ username, room });
+    console.log(myBlockChain.isChainValid());
 
     if (error) {
       return callback(error);
