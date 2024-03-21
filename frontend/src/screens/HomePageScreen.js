@@ -12,7 +12,6 @@ import {
   Toolbar,
 } from "@mui/material";
 import axios from "axios";
-
 import ScrollableRoomList from "../components/ScrollableRoomList"; // Import the new component
 
 const HomePage = ({ onFormSubmit }) => {
@@ -48,12 +47,14 @@ const HomePage = ({ onFormSubmit }) => {
   return (
     <div
       style={{
+        background: "rgb(32,31,122)",
+        background: "radial-gradient(circle, rgba(32,31,122,1) 15%, rgba(46,45,159,1) 45%, rgba(60,83,221,1) 85%, rgba(176,53,247,1) 95%)",  
         backgroundSize: "cover",
         height: "100vh",
       }}
     >
       <CssBaseline />
-      <AppBar position="static">
+      <AppBar position="static" sx={{ backgroundColor: '#18245c' }}>
         <Toolbar></Toolbar>
       </AppBar>
       <Container
@@ -63,17 +64,17 @@ const HomePage = ({ onFormSubmit }) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          background: "rgba(255, 255, 255, 0.8)",
+          background: "rgba(32,31,122,0)",
           p: 2,
-          borderRadius: 2,
+          borderRadius: 20,
         }}
       >
         <Paper
           elevation={3}
-          sx={{ p: 3, width: "100%", mb: 5, paddingTop: 10 }}
+          sx={{ p: 3, width: "100%", mb: 5, padding: 9, borderRadius: 20, backgroundColor: "#040c34" }}
         >
-          <Typography variant="h5" align="center" gutterBottom>
-            Join a Video Stream
+          <Typography variant="h5" align="center" gutterBottom style={{ color: "white", fontFamily: 'Comfortaa, sans-serif', fontWeight: 'bold', fontSize: 35, paddingBottom: 20 }}>
+            Enter Video Stream
           </Typography>
           <Box
             component="form"
@@ -92,6 +93,7 @@ const HomePage = ({ onFormSubmit }) => {
               label="Room ID"
               value={room}
               onChange={(e) => setRoom(e.target.value)}
+              sx={{ backgroundColor: "white", borderRadius: 10}} 
             />
             <TextField
               error={error.username}
@@ -101,21 +103,29 @@ const HomePage = ({ onFormSubmit }) => {
               label="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              sx={{ backgroundColor: "white", borderRadius: 10 }} 
             />
             <Button
               variant="contained"
-              color="primary"
+              style={{ 
+                backgroundColor: "#324be6", 
+                color: "white", 
+                borderRadius: 20,
+                marginTop: 25,
+                fontFamily: 'Comfortaa, sans-serif',
+                fontWeight: 'bold'
+              }}
               onClick={() => handleSubmit()}
             >
-              Join Room
+              Join
             </Button>
           </Box>
         </Paper>
 
-        <Typography variant="h6" align="center" gutterBottom>
+        <Typography variant="h6" align="center" gutterBottom style={{color: "white", fontFamily: 'Comfortaa, sans-serif'}}>
           {availableRooms.length !== 0
             ? "Available Rooms"
-            : "No Public Rooms Available"}
+            : "Public Rooms: Unavailable"}
         </Typography>
         <ScrollableRoomList rooms={availableRooms} />
       </Container>
