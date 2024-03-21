@@ -4,6 +4,9 @@ const multer = require("multer");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
+
+const { encryptFile, decryptFile } = require("./utils/encrypt/encryption");
 
 const {
   addUser,
@@ -50,27 +53,57 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
-app.post("/upload", upload.single("video"), (req, res) => {
-  const { room, isPrivate, title, description } = req.body;
-  console.log(req);
-  console.log(getRoom("test"));
-  changeRoomDetails(room, isPrivate, title, description);
+app.post("/upload", upload.single("video"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
-  return res.status(200).send("File uploaded successfully.");
+
+  const uploadedFilePath = req.file.path;
+  const encryptedFilePath = path.join(
+    "uploads",
+    `encrypted_${req.file.originalname}`
+  );
+  const { room, isPrivate, title, description } = req.body;
+
+  try {
+    await encryptFile(uploadedFilePath, encryptedFilePath);
+    fs.unlinkSync(uploadedFilePath); // Optionally delete the original file
+    changeRoomDetails(room, isPrivate, title, description);
+    res.send("File uploaded and encrypted successfully.");
+  } catch (error) {
+    console.error("Error during file encryption:", error);
+    res.status(500).send("Error encrypting file.");
+  }
 });
 
 app.get("/video/:filename", (req, res) => {
   const { filename } = req.params;
-  const filePath = path.join(__dirname, "uploads", filename);
+  const encryptedFilePath = path.join(
+    __dirname,
+    "uploads",
+    `encrypted_${filename}`
+  );
+  const decryptedFilePath = path.join(
+    __dirname,
+    "uploads",
+    `decrypted_${filename}`
+  );
 
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.log(err);
-      res.status(404).send("Sorry, can't find that file!");
-    }
-  });
+  decryptFile(encryptedFilePath, decryptedFilePath)
+    .then(() => {
+      res.sendFile(decryptedFilePath, (err) => {
+        if (err) {
+          console.log(err);
+          res.status(404).send("Sorry, can't find that file!");
+        }
+        // Optionally delete the decrypted file after sending it to the client
+        fs.unlinkSync(decryptedFilePath);
+      });
+    })
+    .catch((error) => {
+      console.error("Error during file decryption:", error);
+      res.status(500).send("Error decrypting file.");
+    });
 });
 
 app.get("/rooms", (req, res) => {
