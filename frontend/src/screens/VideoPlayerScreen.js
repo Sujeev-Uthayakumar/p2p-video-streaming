@@ -4,7 +4,8 @@ import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
-
+import Fab from "@mui/material/Fab";
+import DownloadIcon from "@mui/icons-material/Download";
 import InputFileUpload from "../components/InputFileUpload";
 import SocketContext from "../components/SocketProvider";
 import Header from "../components/Header";
@@ -60,6 +61,12 @@ const VideoPlayerScreen = ({
     setVideoUrl(URL.createObjectURL(response.data));
   };
 
+  const downloadVideo = async () => {
+    await axios.post(`http://localhost:3001/download/video/${videoTitle}`, {
+      responseType: "blob",
+    });
+  };
+
   return (
     <div>
       <Header
@@ -111,6 +118,21 @@ const VideoPlayerScreen = ({
           handleUploadSuccess={handleUploadSuccess}
           room={room}
         />
+      ) : null}
+      {videoUrl ? (
+        <Box>
+          <a
+            href={`http://localhost:3001/download/video/${videoTitle}`}
+            download={"test.mp4"}
+          >
+            <Fab
+              size="medium"
+              sx={{ position: "absolute", bottom: 105, right: 36 }}
+            >
+              <DownloadIcon />
+            </Fab>
+          </a>
+        </Box>
       ) : null}
     </div>
   );
