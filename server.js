@@ -174,7 +174,7 @@ app.post("/register", async (req, res) => {
     });
 
     await newUser.save();
-    res.status(201).send("User created");
+    res.status(201).send("User registered successfully");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error registering new user");

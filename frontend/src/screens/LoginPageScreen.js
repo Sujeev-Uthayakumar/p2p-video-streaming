@@ -89,6 +89,7 @@ const LoginPageScreen = ({ onLogin, switchAuthPage }) => {
             />
             <TextField
               error={error.password}
+              type="password"
               helperText={error.password ? "Password is required" : ""}
               required
               id="password"

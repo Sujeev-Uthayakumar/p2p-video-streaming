@@ -7,6 +7,7 @@ import VideoPlayerScreen from "./screens/VideoPlayerScreen";
 import HomePage from "./screens/HomePageScreen";
 import RegisterPage from "./screens/RegisterPageScreen";
 import LoginPage from "./screens/LoginPageScreen";
+import AuthService from "./services/AuthService";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -24,6 +25,10 @@ function App() {
   const [openUploadError, setUploadError] = useState(false);
   const [openRoomDeleted, setOpenRoomDeleted] = useState(false);
   const [switchAuthPage, setSwitchAuthPage] = useState(false);
+
+  const isUserLoggedIn = () => {
+    return username !== "";
+  };
 
   const handleFormSubmit = (username, room) => {
     setUsername(username);
@@ -120,15 +125,32 @@ function App() {
   };
 
   const handleRegister = (username, password, confirmPassword) => {
-    console.log(username, password, confirmPassword);
+    AuthService.register(username, password, confirmPassword)
+      .then((response) => {
+        console.log(response.data);
+        if (response.data === "User registered successfully") {
+          setUsername(username);
+        }
+      })
+      .catch((error) => {
+        setOpenError(true);
+      });
   };
 
   const handleLogin = (username, password) => {
-    console.log(username, password);
+    AuthService.login(username, password)
+      .then((response) => {
+        if (response.data === "User logged in successfully") {
+          setUsername(username);
+        }
+      })
+      .catch((error) => {
+        setOpenError(true);
+      });
   };
 
   const userLoggedIn = () => {
-    if (userJoined) {
+    if (room) {
       return (
         <VideoPlayerScreen
           handleUploadError={handleUploadError}
@@ -139,7 +161,7 @@ function App() {
         />
       );
     } else {
-      <HomePage onFormSubmit={handleFormSubmit} />;
+      return <HomePage onFormSubmit={handleFormSubmit} />;
     }
   };
 
@@ -232,7 +254,7 @@ function App() {
           The room was deleted
         </Alert>
       </Snackbar>
-      {username ? userLoggedIn() : userLoggedOut()}
+      {isUserLoggedIn() ? userLoggedIn() : userLoggedOut()}
     </div>
   );
 }

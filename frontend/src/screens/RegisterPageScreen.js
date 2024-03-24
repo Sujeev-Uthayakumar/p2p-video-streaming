@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   TextField,
@@ -25,7 +25,9 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
   const validateInput = () => {
     setError({
       password: password.trim() === "",
-      confirmPassword: confirmPassword.trim() === "",
+      confirmPassword:
+        confirmPassword.trim() === "" ||
+        password.trim() !== confirmPassword.trim(),
       username: username.trim() === "",
     });
     return (
@@ -97,6 +99,7 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
               error={error.password}
               helperText={error.password ? "Password is required" : ""}
               required
+              type="password"
               id="password"
               label="Password"
               value={password}
@@ -105,8 +108,11 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
             <TextField
               error={error.confirmPassword}
               helperText={
-                error.confirmPassword ? "Confirm password is required" : ""
+                error.confirmPassword
+                  ? "Confirm password is required or passwords don't match"
+                  : ""
               }
+              type="password"
               required
               id="confirm-password"
               label="Confirm Password"
