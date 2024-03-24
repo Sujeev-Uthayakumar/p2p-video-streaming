@@ -46,8 +46,6 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
   return (
     <div
       style={{
-        background: "rgb(32,31,122)",
-        background: "radial-gradient(circle, rgba(32,31,122,1) 30%, rgba(50,75,230,1) 75%, rgba(176,53,247,1) 99%)",
         backgroundSize: "cover",
         height: "100vh",
       }}
