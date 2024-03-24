@@ -14,9 +14,8 @@ import {
 import axios from "axios";
 import ScrollableRoomList from "../components/ScrollableRoomList"; // Import the new component
 
-const HomePage = ({ onFormSubmit }) => {
+const HomePage = ({ onFormSubmit, username }) => {
   const [room, setRoom] = useState("");
-  const [username, setUsername] = useState("");
   const [error, setError] = useState({ room: false, username: false });
   const [availableRooms, setAvailableRooms] = useState([]);
 
@@ -95,15 +94,6 @@ const HomePage = ({ onFormSubmit }) => {
               label="Room ID"
               value={room}
               onChange={(e) => setRoom(e.target.value)}
-            />
-            <TextField
-              error={error.username}
-              helperText={error.username ? "Username is required" : ""}
-              required
-              id="username"
-              label="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
             />
             <Button
               variant="contained"

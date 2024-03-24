@@ -161,7 +161,7 @@ function App() {
         />
       );
     } else {
-      return <HomePage onFormSubmit={handleFormSubmit} />;
+      return <HomePage onFormSubmit={handleFormSubmit} username={username} />;
     }
   };
 
