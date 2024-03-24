@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const http = require("http");
 const multer = require("multer");
@@ -5,6 +7,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const { encryptFile, decryptFile } = require("./utils/encrypt/encryption");
 
@@ -25,6 +29,14 @@ const {
 } = require("./utils/rooms");
 const { Blockchain, Block } = require("./utils/crypto/Blockchain");
 
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log(err));
+
 const app = express();
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
@@ -42,6 +54,13 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
+
+const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
+const User = mongoose.model("User", UserSchema);
 
 const myBlockChain = new Blockchain();
 
@@ -142,6 +161,45 @@ app.get("/rooms", (req, res) => {
 
 app.get("/users", (req, res) => {
   res.send(getAllUsers());
+});
+
+app.post("/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const newUser = new User({
+      username,
+      password: hashedPassword,
+    });
+
+    await newUser.save();
+    res.status(201).send("User created");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error registering new user");
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res.status(400).send("User not found");
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).send("Invalid credentials");
+    }
+
+    res.status(200).send("User logged in successfully");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
+  }
 });
 
 io.on("connection", (socket) => {

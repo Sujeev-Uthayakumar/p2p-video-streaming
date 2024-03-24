@@ -1,5 +1,4 @@
-// HomePage.js
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Container,
   TextField,
@@ -10,38 +9,30 @@ import {
   CssBaseline,
   AppBar,
   Toolbar,
+  Link,
 } from "@mui/material";
-import axios from "axios";
-import ScrollableRoomList from "../components/ScrollableRoomList"; // Import the new component
 
-const HomePage = ({ onFormSubmit }) => {
-  const [room, setRoom] = useState("");
+const LoginPageScreen = ({ onLogin, switchAuthPage }) => {
   const [username, setUsername] = useState("");
-  const [error, setError] = useState({ room: false, username: false });
-  const [availableRooms, setAvailableRooms] = useState([]);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState({
+    password: false,
+    confirmPassword: false,
+    username: false,
+  });
 
   const validateInput = () => {
     setError({
-      room: room.trim() === "",
+      password: password.trim() === "",
       username: username.trim() === "",
     });
-    return room.trim() !== "" && username.trim() !== "";
+    return password.trim() !== "" && username.trim() !== "";
   };
 
   const handleSubmit = () => {
     if (validateInput()) {
-      onFormSubmit(username, room);
+      onLogin(username, password);
     }
-  };
-
-  useEffect(() => {
-    getAvailableRooms();
-  }, []);
-
-  const getAvailableRooms = async () => {
-    const response = await axios.get("http://localhost:3001/rooms");
-
-    setAvailableRooms(response.data);
   };
 
   return (
@@ -76,7 +67,7 @@ const HomePage = ({ onFormSubmit }) => {
           }}
         >
           <Typography variant="h5" align="center" gutterBottom>
-            Enter Video Stream
+            Login
           </Typography>
           <Box
             component="form"
@@ -88,15 +79,6 @@ const HomePage = ({ onFormSubmit }) => {
             autoComplete="off"
           >
             <TextField
-              error={error.room}
-              helperText={error.room ? "Room ID is required" : ""}
-              required
-              id="room-id"
-              label="Room ID"
-              value={room}
-              onChange={(e) => setRoom(e.target.value)}
-            />
-            <TextField
               error={error.username}
               helperText={error.username ? "Username is required" : ""}
               required
@@ -105,25 +87,40 @@ const HomePage = ({ onFormSubmit }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
+            <TextField
+              error={error.password}
+              helperText={error.password ? "Password is required" : ""}
+              required
+              id="password"
+              label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Box textAlign="center">
+              <Link
+                component="button"
+                variant="body2"
+                onClick={(event) => {
+                  event.preventDefault();
+                  switchAuthPage();
+                }}
+              >
+                Need an account? Register
+              </Link>
+            </Box>
+
             <Button
               variant="contained"
               color="primary"
               onClick={() => handleSubmit()}
             >
-              Join
+              Login
             </Button>
           </Box>
         </Paper>
-
-        <Typography variant="h6" align="center" gutterBottom>
-          {availableRooms.length !== 0
-            ? "Available Rooms"
-            : "No Public Rooms Available"}
-        </Typography>
-        <ScrollableRoomList rooms={availableRooms} />
       </Container>
     </div>
   );
 };
 
-export default HomePage;
+export default LoginPageScreen;

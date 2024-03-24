@@ -5,6 +5,8 @@ import MuiAlert from "@mui/material/Alert";
 import SocketContext from "./components/SocketProvider";
 import VideoPlayerScreen from "./screens/VideoPlayerScreen";
 import HomePage from "./screens/HomePageScreen";
+import RegisterPage from "./screens/RegisterPageScreen";
+import LoginPage from "./screens/LoginPageScreen";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -21,6 +23,7 @@ function App() {
   const [openUploadSuccess, setUploadSuccess] = useState(false);
   const [openUploadError, setUploadError] = useState(false);
   const [openRoomDeleted, setOpenRoomDeleted] = useState(false);
+  const [switchAuthPage, setSwitchAuthPage] = useState(false);
 
   const handleFormSubmit = (username, room) => {
     setUsername(username);
@@ -116,6 +119,52 @@ function App() {
     setUserJoined(false);
   };
 
+  const handleRegister = (username, password, confirmPassword) => {
+    console.log(username, password, confirmPassword);
+  };
+
+  const handleLogin = (username, password) => {
+    console.log(username, password);
+  };
+
+  const userLoggedIn = () => {
+    if (userJoined) {
+      return (
+        <VideoPlayerScreen
+          handleUploadError={handleUploadError}
+          handleUploadSuccess={handleUploadSuccess}
+          resetUser={resetUser}
+          room={room}
+          username={username}
+        />
+      );
+    } else {
+      <HomePage onFormSubmit={handleFormSubmit} />;
+    }
+  };
+
+  const handleSwitchAuthPage = () => {
+    setSwitchAuthPage(!switchAuthPage);
+  };
+
+  const userLoggedOut = () => {
+    if (switchAuthPage) {
+      return (
+        <LoginPage
+          onLogin={handleLogin}
+          switchAuthPage={handleSwitchAuthPage}
+        />
+      );
+    } else {
+      return (
+        <RegisterPage
+          onRegister={handleRegister}
+          switchAuthPage={handleSwitchAuthPage}
+        />
+      );
+    }
+  };
+
   return (
     <div>
       <Snackbar
@@ -183,17 +232,7 @@ function App() {
           The room was deleted
         </Alert>
       </Snackbar>
-      {!userJoined ? (
-        <HomePage onFormSubmit={handleFormSubmit} />
-      ) : (
-        <VideoPlayerScreen
-          handleUploadError={handleUploadError}
-          handleUploadSuccess={handleUploadSuccess}
-          resetUser={resetUser}
-          room={room}
-          username={username}
-        />
-      )}
+      {username ? userLoggedIn() : userLoggedOut()}
     </div>
   );
 }
