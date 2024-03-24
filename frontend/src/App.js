@@ -22,6 +22,7 @@ function App() {
   const [openJoinedRoom, setOpenJoinedRoom] = useState(false);
   const [openError, setOpenError] = useState(false);
   const [openUploadSuccess, setUploadSuccess] = useState(false);
+  const [openLoginSuccess, setLoginSuccess] = useState(false);
   const [openUploadError, setUploadError] = useState(false);
   const [openRoomDeleted, setOpenRoomDeleted] = useState(false);
   const [switchAuthPage, setSwitchAuthPage] = useState(false);
@@ -112,6 +113,10 @@ function App() {
 
   const handleUploadSuccess = () => {
     setUploadSuccess(true);
+  };
+
+  const handleLoginSuccess = () => {
+    setLoginSuccess(true);
   };
 
   const handleUploadError = () => {
@@ -226,6 +231,19 @@ function App() {
           sx={{ width: "100%" }}
         >
           Upload successful
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={openLoginSuccess}
+        autoHideDuration={1000}
+        onClose={handleLoginSuccess}
+      >
+        <Alert
+          onClose={handleLoginSuccess}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Login successful
         </Alert>
       </Snackbar>
       <Snackbar
