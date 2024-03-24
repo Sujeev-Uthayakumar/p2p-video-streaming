@@ -54,15 +54,14 @@ const VideoPlayerScreen = ({
   }, []);
 
   const getVideo = async (videoTitle) => {
-    const response = await axios.get(
-      `http://localhost:3001/video/${videoTitle}`,
-      { responseType: "blob" }
-    );
+    const response = await axios.get(`http://localhost:3001/video/${room}`, {
+      responseType: "blob",
+    });
     setVideoUrl(URL.createObjectURL(response.data));
   };
 
   const downloadVideo = async () => {
-    await axios.post(`http://localhost:3001/download/video/${videoTitle}`, {
+    await axios.post(`http://localhost:3001/download/video/${room}`, {
       responseType: "blob",
     });
   };
@@ -119,12 +118,9 @@ const VideoPlayerScreen = ({
           room={room}
         />
       ) : null}
-      {videoUrl ? (
+      {videoUrl && !isOwner ? (
         <Box>
-          <a
-            href={`http://localhost:3001/download/video/${videoTitle}`}
-            download={"test.mp4"}
-          >
+          <a href={`http://localhost:3001/download/video/${room}`}>
             <Fab
               size="medium"
               sx={{ position: "absolute", bottom: 105, right: 36 }}

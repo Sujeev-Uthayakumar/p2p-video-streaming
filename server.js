@@ -54,16 +54,15 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.post("/upload", upload.single("video"), async (req, res) => {
+  const { room, isPrivate, title, description } = req.body;
+
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
 
   const uploadedFilePath = req.file.path;
-  const encryptedFilePath = path.join(
-    "uploads",
-    `encrypted_${req.file.originalname}`
-  );
-  const { room, isPrivate, title, description } = req.body;
+  console.log(uploadedFilePath);
+  const encryptedFilePath = path.join("uploads", `encrypted_${room}`);
 
   try {
     await encryptFile(uploadedFilePath, encryptedFilePath);
@@ -92,6 +91,37 @@ app.get("/video/:filename", (req, res) => {
   decryptFile(encryptedFilePath, decryptedFilePath)
     .then(() => {
       res.sendFile(decryptedFilePath, (err) => {
+        if (err) {
+          console.log(err);
+          res.status(404).send("Sorry, can't find that file!");
+        }
+        // Optionally delete the decrypted file after sending it to the client
+        fs.unlinkSync(decryptedFilePath);
+      });
+    })
+    .catch((error) => {
+      console.error("Error during file decryption:", error);
+      res.status(500).send("Error decrypting file.");
+    });
+});
+
+app.get("/download/video/:filename", (req, res) => {
+  const { filename } = req.params;
+  const encryptedFilePath = path.join(
+    __dirname,
+    "uploads",
+    `encrypted_${filename}`
+  );
+
+  const decryptedFilePath = path.join(
+    __dirname,
+    "uploads",
+    `decrypted_${filename}.mp4`
+  );
+
+  decryptFile(encryptedFilePath, decryptedFilePath)
+    .then(() => {
+      res.download(decryptedFilePath, (err) => {
         if (err) {
           console.log(err);
           res.status(404).send("Sorry, can't find that file!");
