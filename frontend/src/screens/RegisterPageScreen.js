@@ -70,13 +70,22 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
           sx={{
             p: 3,
             width: "100%",
-            backgroundColor: "#040c34",
-            borderRadius: 20,
             mb: 5,
             padding: 9,
           }}
         >
-          <Typography variant="h5" align="center" gutterBottom style={{ color: "white", fontFamily: 'Comfortaa, sans-serif', fontWeight: 'bold', fontSize: 40, paddingBottom: 20 }}>
+          <Typography
+            variant="h5"
+            align="center"
+            gutterBottom
+            style={{
+              color: "white",
+              fontFamily: "Comfortaa, sans-serif",
+              fontWeight: "bold",
+              fontSize: 40,
+              paddingBottom: 20,
+            }}
+          >
             Register
           </Typography>
           <Box
@@ -96,7 +105,6 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
               label="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              sx={{ backgroundColor: "white", borderRadius: 10}}
             />
             <TextField
               error={error.password}
@@ -107,7 +115,6 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
               label="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              sx={{ backgroundColor: "white", borderRadius: 10}}
             />
             <TextField
               error={error.confirmPassword}
@@ -122,7 +129,6 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
               label="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              sx={{ backgroundColor: "white", borderRadius: 10}}
             />
             <Box textAlign="center">
               <Link
@@ -132,7 +138,6 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
                   event.preventDefault();
                   switchAuthPage();
                 }}
-                sx={{ fontFamily: 'Comfortaa, sans-serif', fontWeight: 'bold',}}
               >
                 Already have an account? Login
               </Link>
@@ -142,14 +147,6 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
               variant="contained"
               color="primary"
               onClick={() => handleSubmit()}
-              style={{ 
-                backgroundColor: "#324be6", 
-                color: "white", 
-                borderRadius: 20,
-                marginTop: 25,
-                fontFamily: 'Comfortaa, sans-serif',
-                fontWeight: 'bold'
-              }}
             >
               Register
             </Button>

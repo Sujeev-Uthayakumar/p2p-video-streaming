@@ -62,13 +62,11 @@ const LoginPageScreen = ({ onLogin, switchAuthPage }) => {
           sx={{
             p: 3,
             width: "100%",
-            backgroundColor: "#040c34",
-            borderRadius: 20,
             mb: 5,
             padding: 9,
           }}
         >
-          <Typography variant="h5" align="center" gutterBottom style={{ color: "white", fontFamily: 'Comfortaa, sans-serif', fontWeight: 'bold', fontSize: 35, paddingBottom: 20 }}>
+          <Typography variant="h5" align="center" gutterBottom>
             Login
           </Typography>
           <Box
@@ -88,7 +86,6 @@ const LoginPageScreen = ({ onLogin, switchAuthPage }) => {
               label="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              sx={{ backgroundColor: "white", borderRadius: 10}}
             />
             <TextField
               error={error.password}
@@ -99,7 +96,6 @@ const LoginPageScreen = ({ onLogin, switchAuthPage }) => {
               label="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              sx={{ backgroundColor: "white", borderRadius: 10}}
             />
             <Box textAlign="center">
               <Link
@@ -109,7 +105,6 @@ const LoginPageScreen = ({ onLogin, switchAuthPage }) => {
                   event.preventDefault();
                   switchAuthPage();
                 }}
-                sx={{ fontFamily: 'Comfortaa, sans-serif', fontWeight: 'bold',}}
               >
                 Need an account? Register
               </Link>
@@ -119,14 +114,6 @@ const LoginPageScreen = ({ onLogin, switchAuthPage }) => {
               variant="contained"
               color="primary"
               onClick={() => handleSubmit()}
-              style={{ 
-                backgroundColor: "#324be6", 
-                color: "white", 
-                borderRadius: 20,
-                marginTop: 25,
-                fontFamily: 'Comfortaa, sans-serif',
-                fontWeight: 'bold'
-              }}
             >
               Login
             </Button>
