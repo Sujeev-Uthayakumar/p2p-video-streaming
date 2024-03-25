@@ -74,18 +74,7 @@ const RegisterPageScreen = ({ onRegister, switchAuthPage }) => {
             padding: 9,
           }}
         >
-          <Typography
-            variant="h5"
-            align="center"
-            gutterBottom
-            style={{
-              color: "white",
-              fontFamily: "Comfortaa, sans-serif",
-              fontWeight: "bold",
-              fontSize: 40,
-              paddingBottom: 20,
-            }}
-          >
+          <Typography variant="h5" align="center" gutterBottom>
             Register
           </Typography>
           <Box
