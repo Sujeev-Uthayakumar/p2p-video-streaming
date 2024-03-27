@@ -1,8 +1,8 @@
-# Peer-to-Peer Video Streaming Service
+# Secure Video Streaming Service
 
 ## Overview
 
-This project is a peer-to-peer (P2P) video streaming service, designed to facilitate direct video streaming between users. The frontend is built using React, providing a dynamic and responsive user interface. The backend is powered by `simple-peer`, `Express.js`, and `Node.js`, ensuring efficient handling of peer-to-peer connections and server-side functionalities.
+This project is a secure peer-to-peer (P2P) video streaming service, designed to facilitate direct video streaming between users. The frontend is built using React, providing a dynamic and responsive user interface. The backend is powered by `simple-peer`, `Express.js`, and `Node.js`, ensuring efficient handling of peer-to-peer connections and server-side functionalities.
 
 ## Features
 
@@ -11,6 +11,17 @@ This project is a peer-to-peer (P2P) video streaming service, designed to facili
 - **Easy Navigation:** User-friendly interface with intuitive controls for streaming and viewing videos.
 - **Secure Connections:** Implementation of secure peer connections to ensure privacy and data integrity.
 - **Private and Public Rooms:** Allows video streaming to the users that are intended to view the streams.
+- **User Chat Functionality:** Allows users a chat box to message communicate.
+
+## Security Features
+
+- **User Authentication:** Uses MongoDB to authenticate users before creating/joining a room
+- **AES Encrypted Video Streaming:** Uses AES encryption to encrypt the video stream from the host to the users
+- **Encrypted Video Download:**
+- **JWT:**
+
+
+
 
 ## Prerequisites
 
