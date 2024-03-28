@@ -15,10 +15,9 @@ This project is a secure peer-to-peer (P2P) video streaming service, designed to
 
 ## Security Features
 
-- **User Authentication:** Uses MongoDB to authenticate users before creating/joining a room
+- **User Authentication:** Uses MongoDB and JSON Web Tokens(JWT) to authenticate users before creating/joining a room
 - **AES Encrypted Video Streaming:** Uses AES encryption to encrypt the video stream from the host to the users
-- **Encrypted Video Download:**
-- **JWT:**
+- **Encrypted Video Download:** Transmits an encrypted video file to user via HTTPS download request
 
 
 
